@@ -82,6 +82,9 @@ CapsLock Up:: {
     d::
     f:: return
 
+    ; BLOCK DEFAULT ACTION FOR LALT, USER FOR SCROLLING
+    LAlt:: return
+
 #HotIf
 
 StartArrow(key) {
@@ -116,16 +119,21 @@ MoveMouseContinuously(*) {
 
     elapsedMove := A_TickCount - firstArrowPressTime
     if arrowStates["Left"]
-        mouse_x -= GetSpeed(elapsedMove)
+        dx -= GetSpeed(elapsedMove)
     if arrowStates["Right"]
-        mouse_x += GetSpeed(elapsedMove)
+        dx += GetSpeed(elapsedMove)
     if arrowStates["Up"]
-        mouse_y -= GetSpeed(elapsedMove)
+        if(GetKeyState("LAlt", "P"))
+            SendEvent("{WheelUp " GetSpeed(elapsedMove)/5 "}")
+        else
+            dy -= GetSpeed(elapsedMove)
     if arrowStates["Down"]
-        mouse_y += GetSpeed(elapsedMove)
-
-    if (mouse_x != 0 or mouse_y != 0)
-        MouseMove(mouse_x, mouse_y, 0, "R")
+        if(GetKeyState("LAlt", "P"))
+            SendEvent("{WheelDown " GetSpeed(elapsedMove)/5 "}")
+        else
+            dy += GetSpeed(elapsedMove)
+    if (dx != 0 or dy != 0)
+        MouseMove(dx, dy, 0, "R")
 }
 
 GetSpeed(elapsedMove) {
