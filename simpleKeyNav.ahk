@@ -41,7 +41,7 @@ CapsLock Up:: {
 
 #HotIf capsLockHeld && A_TickCount - capsLockTimer >= longPressThreshold
 
-    ; Tastierino numerico simulato
+    ; KEYPAD
     PrintScreen:: Send("7")
     ScrollLock:: Send("8")
     Pause:: Send("9")
@@ -53,12 +53,12 @@ CapsLock Up:: {
     PgDn:: Send("3")
     \:: Send("0")
 
-    ; Click mouse
+    ; MOUSE CLICK
     Space:: LButton
     RCtrl:: RButton
     AppsKey::MButton
 
-    ; Frecce con accelerazione
+    ; ARROWS
     Up::
      k::StartArrow("Up")
     Up Up::
@@ -76,7 +76,7 @@ CapsLock Up:: {
     Right Up::
         l Up:: StopArrow("Right")
 
-    ; Inibitore dei tasti per il moltiplicatore del movimento del mouse
+    ; BLOCK DEFAULT ACTION FOR KEYS
     a::
     s::
     d::
@@ -104,28 +104,28 @@ StopArrow(key) {
     }
 }
 
-; Timer centrale
+; PRIMARY TIMER
 SetTimer(MoveMouseContinuously, 10)
 
 MoveMouseContinuously(*) {
     if !capsLockHeld
         return
 
-    dx := 0
-    dy := 0
+    mouse_x := 0
+    mouse_y := 0
 
     elapsedMove := A_TickCount - firstArrowPressTime
     if arrowStates["Left"]
-        dx -= GetSpeed(elapsedMove)
+        mouse_x -= GetSpeed(elapsedMove)
     if arrowStates["Right"]
-        dx += GetSpeed(elapsedMove)
+        mouse_x += GetSpeed(elapsedMove)
     if arrowStates["Up"]
-        dy -= GetSpeed(elapsedMove)
+        mouse_y -= GetSpeed(elapsedMove)
     if arrowStates["Down"]
-        dy += GetSpeed(elapsedMove)
+        mouse_y += GetSpeed(elapsedMove)
 
-    if (dx != 0 or dy != 0)
-        MouseMove(dx, dy, 0, "R")
+    if (mouse_x != 0 or mouse_y != 0)
+        MouseMove(mouse_x, mouse_y, 0, "R")
 }
 
 GetSpeed(elapsedMove) {
@@ -155,6 +155,7 @@ DoubleMouseMultiplier() {
         mouseMoltiplier := 12
 }
 
+; NOT USED
 HalveMouseMultiplier() {
     global mouseMoltiplier
     mouseMoltiplier := mouseMoltiplier / 2
@@ -163,25 +164,26 @@ HalveMouseMultiplier() {
 }
 
 ShowText(txt, duration := 500) {
-    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x08000000")  ; senza bordi né barra e WS_EX_NOACTICE
+    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x08000000")  ; NO BORDERS NO BAR: WS_EX_NOACTICE
 
+    ; GUI SPECS
     MyGui.BackColor := "Black"
     MyGui.SetFont("s10 cWhite", "Segoe UI")
     MyGui.Add("Text", "Center w200", txt)
 
-    ; Ottieni dimensioni schermo
+    ; SCREEN SIZE
     screenWidth := A_ScreenWidth
     screenHeight := A_ScreenHeight
 
-    ; Ottieni dimensioni GUI
+    ; GUI SIZE
     WinGetPos(&xGui, &yGui, &wGui, &hGui, myGui.Hwnd)
 
-    ; Calcola posizione: centrata in basso
+    ; CENTER BOTTOM POSITION
     x := (screenWidth - wGui) // 2
     y := screenHeight - hGui - 100
 
     myGui.Show("AutoSize Center y" y)
 
-    ; Aspetta e chiude
+    ; WAIT AND CLOSE GUI
     SetTimer(() => MyGui.Destroy(), -duration)
 }
