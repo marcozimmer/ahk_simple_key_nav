@@ -45,5 +45,5 @@ For TKL keyboards:
 - Delete: <b>1</b>
 - End: <b>2</b>
 - PgDn: <b>3</b>
-- \: <b>0</b>
+- \\: <b>0</b>
 
