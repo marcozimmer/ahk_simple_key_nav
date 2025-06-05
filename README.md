@@ -28,9 +28,9 @@ all clicks can be used in drag mode.
 
 Mouse movement is incremented by the time you hold down the arrow keys.
 
-- a:<b>mouse movement moltiplied by 2</b>
-- s:<b>mouse movement moltiplied by 2</b>
-- d:<b>mouse movement moltiplied by 2</b>
+- a: <b>mouse movement moltiplied by 2</b>
+- s: <b>mouse movement moltiplied by 2</b>
+- d: <b>mouse movement moltiplied by 2</b>
 
 a, s and d can be combined together.
 
