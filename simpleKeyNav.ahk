@@ -114,29 +114,35 @@ MoveMouseContinuously(*) {
     if !capsLockHeld
         return
 
-    mouse_x := 0
-    mouse_y := 0
+    dx := 0
+    dy := 0
 
     elapsedMove := A_TickCount - firstArrowPressTime
     if arrowStates["Left"]
-        dx -= GetSpeed(elapsedMove)
+        if(GetKeyState("LAlt", "P"))
+            SendEvent("{WheelLeft " GetSpeed(elapsedMove, true) "}")
+        else
+            dx -= GetSpeed(elapsedMove)
     if arrowStates["Right"]
-        dx += GetSpeed(elapsedMove)
+        if(GetKeyState("LAlt", "P"))
+            SendEvent("{WheelRight " GetSpeed(elapsedMove, true) "}")
+        else
+            dx += GetSpeed(elapsedMove)
     if arrowStates["Up"]
         if(GetKeyState("LAlt", "P"))
-            SendEvent("{WheelUp " GetSpeed(elapsedMove)/5 "}")
+            SendEvent("{WheelUp " GetSpeed(elapsedMove, true) "}")
         else
             dy -= GetSpeed(elapsedMove)
     if arrowStates["Down"]
         if(GetKeyState("LAlt", "P"))
-            SendEvent("{WheelDown " GetSpeed(elapsedMove)/5 "}")
+            SendEvent("{WheelDown " GetSpeed(elapsedMove, true) "}")
         else
             dy += GetSpeed(elapsedMove)
     if (dx != 0 or dy != 0)
         MouseMove(dx, dy, 0, "R")
 }
 
-GetSpeed(elapsedMove) {
+GetSpeed(elapsedMove, panning := false) {
     global mouseMoltiplier
 
     mouseMoltiplier := 1
@@ -151,9 +157,14 @@ GetSpeed(elapsedMove) {
 
     timeMoltiplier := min(elapsedMove/100, 12)
 
-    ; ShowText(timeMoltiplier . " " . mouseMoltiplier . " " . (timeMoltiplier * mouseMoltiplier))
+    if panning
+        ret := Min(4 * (timeMoltiplier * mouseMoltiplier), 8)
+    else
+        ret:= 2 * (timeMoltiplier * mouseMoltiplier)
 
-    return 2 * (timeMoltiplier * mouseMoltiplier)
+    ShowText(timeMoltiplier . " " . mouseMoltiplier . " " . (timeMoltiplier * mouseMoltiplier))
+
+    return ret
 }
 
 DoubleMouseMultiplier() {
