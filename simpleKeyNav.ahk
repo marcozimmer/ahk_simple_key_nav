@@ -1,4 +1,4 @@
-﻿#Requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 ; #MaxHotkeysPerInterval 1000
 
 global capsLockHeld := false
@@ -8,6 +8,8 @@ global mouseMoltiplier := 1
 
 global arrowStates := Map("Up", false, "Down", false, "Left", false, "Right", false)
 global firstArrowPressTime := 0
+
+global reverseScroll := true
 
 CapsLock:: {
     if(!capsLockHeld)
@@ -116,6 +118,7 @@ MoveMouseContinuously(*) {
 
     dx := 0
     dy := 0
+    global reverseScroll
 
     elapsedMove := A_TickCount - firstArrowPressTime
     if arrowStates["Left"]
@@ -129,13 +132,19 @@ MoveMouseContinuously(*) {
         else
             dx += GetSpeed(elapsedMove)
     if arrowStates["Up"]
-        if(GetKeyState("LAlt", "P"))
-            SendEvent("{WheelUp " GetSpeed(elapsedMove, true) "}")
+        if(GetKeyState("LAlt", "P")) {
+            direction := reverseScroll ? "{WheelDown}" : "{WheelUp}"
+            ShowText(direction)
+            SendEvent(direction)
+        }
         else
             dy -= GetSpeed(elapsedMove)
     if arrowStates["Down"]
-        if(GetKeyState("LAlt", "P"))
-            SendEvent("{WheelDown " GetSpeed(elapsedMove, true) "}")
+        if(GetKeyState("LAlt", "P")) {
+            direction := reverseScroll ? "{WheelUp}" : "{WheelDown}"
+            ShowText(direction)
+            SendEvent(direction)
+        }
         else
             dy += GetSpeed(elapsedMove)
     if (dx != 0 or dy != 0)
@@ -162,7 +171,7 @@ GetSpeed(elapsedMove, panning := false) {
     else
         ret:= 2 * (timeMoltiplier * mouseMoltiplier)
 
-    ShowText(timeMoltiplier . " " . mouseMoltiplier . " " . (timeMoltiplier * mouseMoltiplier))
+    ; ShowText(timeMoltiplier . " " . mouseMoltiplier . " " . (timeMoltiplier * mouseMoltiplier))
 
     return ret
 }
