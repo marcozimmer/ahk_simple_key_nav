@@ -9,7 +9,8 @@ global mouseMoltiplier := 1
 global arrowStates := Map("Up", false, "Down", false, "Left", false, "Right", false)
 global firstArrowPressTime := 0
 
-global reverseScroll := true
+global reverseVScroll := false
+global reverseHScroll := false
 
 CapsLock:: {
     if(!capsLockHeld)
@@ -56,7 +57,7 @@ CapsLock Up:: {
     \:: Send("0")
 
     ; MOUSE CLICK
-    Space:: LButton
+    f:: LButton
     RCtrl:: RButton
     AppsKey::MButton
 
@@ -82,7 +83,7 @@ CapsLock Up:: {
     a::
     s::
     d::
-    f:: return
+    Space:: return
 
     ; BLOCK DEFAULT ACTION FOR LALT, USER FOR SCROLLING
     LAlt:: return
@@ -113,39 +114,39 @@ StopArrow(key) {
 SetTimer(MoveMouseContinuously, 10)
 
 MoveMouseContinuously(*) {
+    global reverseVScroll
+    global reverseHScroll
+
     if !capsLockHeld
         return
 
     dx := 0
     dy := 0
-    global reverseScroll
 
     elapsedMove := A_TickCount - firstArrowPressTime
     if arrowStates["Left"]
-        if(GetKeyState("LAlt", "P"))
-            SendEvent("{WheelLeft " GetSpeed(elapsedMove, true) "}")
-        else
+        if(GetKeyState("Space", "P")) {
+            direction := reverseVScroll ? "{WheelLeft}" : "{WheelRight}"
+            SendEvent(direction)
+        } else
             dx -= GetSpeed(elapsedMove)
     if arrowStates["Right"]
-        if(GetKeyState("LAlt", "P"))
-            SendEvent("{WheelRight " GetSpeed(elapsedMove, true) "}")
-        else
+        if(GetKeyState("Space", "P")) {
+            direction := reverseVScroll ? "{WheelRight}" : "{WheelLeft}"
+            SendEvent(direction)
+        } else
             dx += GetSpeed(elapsedMove)
     if arrowStates["Up"]
-        if(GetKeyState("LAlt", "P")) {
-            direction := reverseScroll ? "{WheelDown}" : "{WheelUp}"
-            ShowText(direction)
+        if(GetKeyState("Space", "P")) {
+            direction := reverseVScroll ? "{WheelUp}" : "{WheelDown}"
             SendEvent(direction)
-        }
-        else
+        } else
             dy -= GetSpeed(elapsedMove)
     if arrowStates["Down"]
-        if(GetKeyState("LAlt", "P")) {
-            direction := reverseScroll ? "{WheelUp}" : "{WheelDown}"
-            ShowText(direction)
+        if(GetKeyState("Space", "P")) {
+            direction := reverseVScroll ? "{WheelDown}" : "{WheelUp}"
             SendEvent(direction)
-        }
-        else
+        } else
             dy += GetSpeed(elapsedMove)
     if (dx != 0 or dy != 0)
         MouseMove(dx, dy, 0, "R")
@@ -160,8 +161,6 @@ GetSpeed(elapsedMove, panning := false) {
     if(GetKeyState("s", "P"))
         DoubleMouseMultiplier()
     if(GetKeyState("d", "P"))
-        DoubleMouseMultiplier()
-    if(GetKeyState("f", "P"))
         DoubleMouseMultiplier()
 
     timeMoltiplier := min(elapsedMove/100, 12)
