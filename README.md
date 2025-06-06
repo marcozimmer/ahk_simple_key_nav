@@ -20,9 +20,11 @@ like vim, if you don't have cursor arrows available:
 - k: <b>mouse up</b>
 - l: <b>mouse right</b>
 
-- Space: <b>Left Click</b>
+- f: <b>Left Click</b>
 - RCtrl: <b>Right Click</b>
 - AppsKey: <b>Middle click</b>
+
+- Space pressed: <b>Actove Scroll</b>
 
 all clicks can be used in drag mode.
 
