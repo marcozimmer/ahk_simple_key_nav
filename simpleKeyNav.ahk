@@ -9,8 +9,47 @@ global mouseMoltiplier := 1
 global arrowStates := Map("Up", false, "Down", false, "Left", false, "Right", false)
 global firstArrowPressTime := 0
 
-global reverseVScroll := false
+global reverseVScroll := true
 global reverseHScroll := false
+
+
+; READ CONFIG FILE
+
+config := "simpleKeyNavConfig.ini"
+
+GroupMouseMove  := Map()
+GroupMouseMove2 := Map()
+GroupMouseClick := Map()
+GroupKeyPad     := Map()
+
+; MOUSE MOVE
+GroupMouseMove["_up"]      := IniRead(config, "MouseMove", "up", "Up")
+GroupMouseMove["_down"]    := IniRead(config, "MouseMove", "down", "Down")
+GroupMouseMove["_left"]    := IniRead(config, "MouseMove", "left", "Left")
+GroupMouseMove["_right"]   := IniRead(config, "MouseMove", "right", "Right")
+
+; ALT MOUSE MOVE
+GroupMouseMove2["_up2"]    := IniRead(config, "MouseMove2", "up", "i")
+GroupMouseMove2["_down2"]  := IniRead(config, "MouseMove2", "down", "k")
+GroupMouseMove2["_left2"]  := IniRead(config, "MouseMove2", "left", "j")
+GroupMouseMove2["_right2"] := IniRead(config, "MouseMove2", "right", "l")
+
+; ALT MOUSE CLICK
+GroupMouseClick["_lclick"] := IniRead(config, "MouseClick", "lclick", "c")
+GroupMouseClick["_mclick"] := IniRead(config, "MouseClick", "mclick", "x")
+GroupMouseClick["_rclick"] := IniRead(config, "MouseClick", "rclick", "z")
+
+; KEYPAD
+GroupKeyPad["_1"]          := IniRead(config, "KeyPad", "1", "PrintScreen")
+GroupKeyPad["_2"]          := IniRead(config, "KeyPad", "2", "ScrollLock")
+GroupKeyPad["_3"]          := IniRead(config, "KeyPad", "3", "Pause")
+GroupKeyPad["_4"]          := IniRead(config, "KeyPad", "4", "Insert")
+GroupKeyPad["_5"]          := IniRead(config, "KeyPad", "5", "Home")
+GroupKeyPad["_6"]          := IniRead(config, "KeyPad", "6", "PgUp")
+GroupKeyPad["_7"]          := IniRead(config, "KeyPad", "7", "Delete")
+GroupKeyPad["_8"]          := IniRead(config, "KeyPad", "8", "End")
+GroupKeyPad["_9"]          := IniRead(config, "KeyPad", "9", "PgDn")
+GroupKeyPad["_0"]          := IniRead(config, "KeyPad", "0", "\")
 
 CapsLock:: {
     if(!capsLockHeld)
@@ -24,6 +63,8 @@ CapsLock:: {
 
     global capsLockHeld := true
     global mouseMoltiplier := 1
+
+    SetHotKeys()
 
 }
 
@@ -40,55 +81,89 @@ CapsLock Up:: {
 
     firstArrowPressTime := 0
     global capsLockHeld := false
+
+    UnsetHotKeys()
 }
 
-#HotIf capsLockHeld && A_TickCount - capsLockTimer >= longPressThreshold
+;#HotIf capsLockHeld && A_TickCount - capsLockTimer >= longPressThreshold
+;
+;#HotIf
 
-    ; KEYPAD
-    PrintScreen:: Send("7")
-    ScrollLock:: Send("8")
-    Pause:: Send("9")
-    Insert:: Send("4")
-    Home:: Send("5")
-    PgUp:: Send("6")
-    Delete:: Send("1")
-    End:: Send("2")
-    PgDn:: Send("3")
-    \:: Send("0")
+SetHotKeys() {
+    Hotkey(GroupMouseMove["_up"],            (*) => StartArrow("Up"))
+    Hotkey(GroupMouseMove["_up"] " UP",      (*) => StopArrow("Up"))
+    Hotkey(GroupMouseMove["_left"],          (*) => StartArrow("Left"))
+    Hotkey(GroupMouseMove["_left"] " UP",    (*) => StopArrow("Left"))
+    Hotkey(GroupMouseMove["_down"],          (*) => StartArrow("Down"))
+    Hotkey(GroupMouseMove["_down"] " UP",    (*) => StopArrow("Down"))
+    Hotkey(GroupMouseMove["_right"],         (*) => StartArrow("Right"))
+    Hotkey(GroupMouseMove["_right"] " UP",   (*) => StopArrow("Right"))
 
-    ; MOUSE CLICK
-    f:: LButton
-    RCtrl:: RButton
-    AppsKey::MButton
+    Hotkey(GroupMouseMove2["_up2"],          (*) => StartArrow("Up"))
+    Hotkey(GroupMouseMove2["_up2"] " UP",    (*) => StopArrow("Up"))
+    Hotkey(GroupMouseMove2["_left2"],        (*) => StartArrow("Left"))
+    Hotkey(GroupMouseMove2["_left2"] " UP",  (*) => StopArrow("Left"))
+    Hotkey(GroupMouseMove2["_down2"],        (*) => StartArrow("Down"))
+    Hotkey(GroupMouseMove2["_down2"] " UP",  (*) => StopArrow("Down"))
+    Hotkey(GroupMouseMove2["_right2"],       (*) => StartArrow("Right"))
+    Hotkey(GroupMouseMove2["_right2"] " UP", (*) => StopArrow("Right"))
 
-    ; ARROWS
-    Up::
-     k::StartArrow("Up")
-    Up Up::
-     k Up:: StopArrow("Up")
-    Down::
-       j:: StartArrow("Down")
-    Down Up::
-       j Up:: StopArrow("Down")
-    Left::
-       h:: StartArrow("Left")
-    Left Up::
-       h Up:: StopArrow("Left")
-    Right::
-        l:: StartArrow("Right")
-    Right Up::
-        l Up:: StopArrow("Right")
+    Hotkey(GroupMouseClick["_lclick"],       (*) => Send("{LButton down}"))
+    Hotkey(GroupMouseClick["_lclick"] " UP", (*) => Send("{LButton up}"))
+    Hotkey(GroupMouseClick["_mclick"],       (*) => Send("{MButton down}"))
+    Hotkey(GroupMouseClick["_mclick"] " UP", (*) => Send("{MButton up}"))
+    Hotkey(GroupMouseClick["_rclick"],       (*) => Send("{RButton down}"))
+    Hotkey(GroupMouseClick["_rclick"] " UP", (*) => Send("{RButton up}"))
 
-    ; BLOCK DEFAULT ACTION FOR KEYS
-    a::
-    s::
-    d::
-    Space:: return
+    Hotkey(GroupKeyPad["_1"],                (*) => Send("1"))
+    Hotkey(GroupKeyPad["_2"],                (*) => Send("2"))
+    Hotkey(GroupKeyPad["_3"],                (*) => Send("3"))
+    Hotkey(GroupKeyPad["_4"],                (*) => Send("4"))
+    Hotkey(GroupKeyPad["_5"],                (*) => Send("5"))
+    Hotkey(GroupKeyPad["_6"],                (*) => Send("6"))
+    Hotkey(GroupKeyPad["_7"],                (*) => Send("7"))
+    Hotkey(GroupKeyPad["_8"],                (*) => Send("8"))
+    Hotkey(GroupKeyPad["_9"],                (*) => Send("9"))
+    Hotkey(GroupKeyPad["_0"],                (*) => Send("0"))
 
-    ; BLOCK DEFAULT ACTION FOR LALT, USER FOR SCROLLING
-    LAlt:: return
-
-#HotIf
+    try {
+        for k, v in GroupMouseMove {
+            Hotkey(v,       "On")
+            Hotkey(v " UP", "On")
+        }
+        for k, v in GroupMouseMove2 {
+            Hotkey(v,       "On")
+            Hotkey(v " UP", "On")
+        }
+        for k, v in GroupMouseClick {
+            Hotkey(v,       "On")
+            Hotkey(v " UP", "On")
+        }
+        for k, v in GroupKeyPad {
+            Hotkey(v,       "On")
+        }
+    }
+}
+    
+UnsetHotKeys() {
+    try {
+        for k, v in GroupMouseMove  {
+            Hotkey(v,       "Off")
+            Hotkey(v " UP", "Off")
+        }
+        for k, v in GroupMouseMove2 {
+            Hotkey(v,       "Off")
+            Hotkey(v " UP", "Off")
+        }
+        for k, v in GroupMouseClick {
+            Hotkey(v,       "Off")
+            Hotkey(v " UP", "Off")
+        }
+        for k, v in GroupKeyPad     {
+            Hotkey(v,       "Off")
+        }
+    }
+}
 
 StartArrow(key) {
     global firstArrowPressTime
@@ -97,7 +172,7 @@ StartArrow(key) {
     if (firstArrowPressTime = 0) {
         firstArrowPressTime := A_TickCount
     }
-    ; ShowText(arrowStates["Left"] . " " . arrowStates["Right"] . " " . arrowStates["Up"] . " " . arrowStates["Down"])
+    ; ShowText(key . " " . arrowStates["Left"] . " " . arrowStates["Right"] . " " . arrowStates["Up"] . " " . arrowStates["Down"])
 }
 
 StopArrow(key) {
