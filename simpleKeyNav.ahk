@@ -91,25 +91,28 @@ GroupKeyPad["_0"]          := IniRead(config, "KeyPad", "0", "\")
 ; CAPSLOCK
 ; ******************************************************************************
 
-CapsLock:: {
-    if (A_PriorHotkey = "CapsLock" and A_TimeSincePriorHotkey < 300 and A_TimeSincePriorHotkey > 100) {
+$CapsLock:: {
+    if (A_PriorHotkey = "$CapsLock" and A_TimeSincePriorHotkey < 300 and A_TimeSincePriorHotkey > 100) {
         if capsLockHeld {
             SendEscape()
         } else {
+            SetCapsLockState(false)
+
             SoundBeep(200, 100)
             SoundBeep(300, 100)
 
-            global capsLockTimer := A_TickCount
-            ; ShowText("[LAYER]", 500)
-
             firstArrowPressTime := 0
 
+            global capsLockTimer := A_TickCount
             global capsLockHeld := true
             global mouseMoltiplier := 1
+
 
             SetHotKeys()
         }
     } else {
+        global capsLockHeld := false
+        global capsLockTimer := 0
         SetCapsLockState(!GetKeyState("CapsLock", "T"))
     }
 }
