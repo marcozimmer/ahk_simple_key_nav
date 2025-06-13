@@ -1,26 +1,49 @@
 #Requires AutoHotkey v2.0
-; #MaxHotkeysPerInterval 1000
+#SingleInstance Force
+
+; READ CONFIG FILE
+config := "simpleKeyNavConfig.ini"
+
+MyGui := Gui()
 
 global capsLockHeld := false
 global capsLockTimer := 0
-global longPressThreshold := 100
+global longPressThreshold := 200
 global mouseMoltiplier := 1
 
 global arrowStates := Map("Up", false, "Down", false, "Left", false, "Right", false)
 global firstArrowPressTime := 0
 
-global reverseVScroll := true
-global reverseHScroll := false
+global WinHeld    := false
+global AltHeld    := false
+global CtrlHeld   := false
+global ShiftHeld  := false
+
+global WinTimer   := 0
+global AltTimer   := 0
+global CtrlTimer  := 0
+global ShiftTimer := 0
+
+global HomeRowTimer := 0
+
+GroupHomeRow         := Map()
+GroupMouseMove       := Map()
+GroupMouseMove2      := Map()
+GroupMouseClick      := Map()
+GroupMouseMultiplier := Map()
+GroupMouseScroll     := Map()
+GroupKeyPad          := Map()
 
 
-; READ CONFIG FILE
-
-config := "simpleKeyNavConfig.ini"
-
-GroupMouseMove  := Map()
-GroupMouseMove2 := Map()
-GroupMouseClick := Map()
-GroupKeyPad     := Map()
+; HOME ROW
+GroupHomeRow["_lwin"]    := IniRead(config, "HomeRow", "LWin", "a")
+GroupHomeRow["_lalt"]    := IniRead(config, "HomeRow", "LAlt", "s")
+GroupHomeRow["_lctrl"]   := IniRead(config, "HomeRow", "LCtrl", "d")
+GroupHomeRow["_lshift"]  := IniRead(config, "HomeRow", "LShift", "f")
+GroupHomeRow["_rwin"]    := IniRead(config, "HomeRow", "RWin", ";")
+GroupHomeRow["_ralt"]    := IniRead(config, "HomeRow", "RAlt", "l")
+GroupHomeRow["_rctrl"]   := IniRead(config, "HomeRow", "RCtrl", "k")
+GroupHomeRow["_rshift"]  := IniRead(config, "HomeRow", "RShift", "j")
 
 ; MOUSE MOVE
 GroupMouseMove["_up"]      := IniRead(config, "MouseMove", "up", "Up")
@@ -39,6 +62,17 @@ GroupMouseClick["_lclick"] := IniRead(config, "MouseClick", "lclick", "c")
 GroupMouseClick["_mclick"] := IniRead(config, "MouseClick", "mclick", "x")
 GroupMouseClick["_rclick"] := IniRead(config, "MouseClick", "rclick", "z")
 
+; ALT MOUSE MULTIPLIER
+GroupMouseMultiplier["_multiplier1"] := IniRead(config, "MouseMultiplier", "multiplier1", "a")
+GroupMouseMultiplier["_multiplier2"] := IniRead(config, "MouseMultiplier", "multiplier2", "s")
+GroupMouseMultiplier["_multiplier3"] := IniRead(config, "MouseMultiplier", "multiplier3", "d")
+
+
+; ALT MOUSE SCROLL
+GroupMouseScroll["_reverseVScroll"] := IniRead(config, "MouseScroll", "reverseVScroll", "false")
+GroupMouseScroll["_reverseHScroll"] := IniRead(config, "MouseScroll", "reverseHScroll", "false")
+GroupMouseScroll["_activeScroll"]   := IniRead(config, "MouseScroll", "activeScroll", "Space")
+
 ; KEYPAD
 GroupKeyPad["_1"]          := IniRead(config, "KeyPad", "1", "PrintScreen")
 GroupKeyPad["_2"]          := IniRead(config, "KeyPad", "2", "ScrollLock")
@@ -51,29 +85,48 @@ GroupKeyPad["_8"]          := IniRead(config, "KeyPad", "8", "End")
 GroupKeyPad["_9"]          := IniRead(config, "KeyPad", "9", "PgDn")
 GroupKeyPad["_0"]          := IniRead(config, "KeyPad", "0", "\")
 
+; SetHomeRowHotKeys()
+
+; ******************************************************************************
+; CAPSLOCK
+; ******************************************************************************
+
 CapsLock:: {
-    if(!capsLockHeld)
-        global capsLockTimer := A_TickCount
+    if (A_PriorHotkey = "CapsLock" and A_TimeSincePriorHotkey < 300 and A_TimeSincePriorHotkey > 100) {
+        if capsLockHeld {
+            SendEscape()
+        } else {
+            SoundBeep(200, 100)
+            SoundBeep(300, 100)
 
-;    if (A_TickCount - capsLockTimer >= longPressThreshold) {
-;        ShowText("_layer_", 500)
-;    }
+            global capsLockTimer := A_TickCount
+            ; ShowText("[LAYER]", 500)
 
-    firstArrowPressTime := 0
+            firstArrowPressTime := 0
 
-    global capsLockHeld := true
-    global mouseMoltiplier := 1
+            global capsLockHeld := true
+            global mouseMoltiplier := 1
 
-    SetHotKeys()
-
-}
-
-CapsLock Up:: {
-    elapsed := A_TickCount - capsLockTimer
-
-    if (elapsed < longPressThreshold) {
+            SetHotKeys()
+        }
+    } else {
         SetCapsLockState(!GetKeyState("CapsLock", "T"))
     }
+}
+
+$Esc:: {
+    if(capsLockHeld) {
+        SendEscape()
+    } else {
+        Send("{Esc}")
+    }
+}
+
+SendEscape() {
+    ; HideText()
+
+    SoundBeep(300, 100)
+    SoundBeep(200, 100)
 
     for key in arrowStates {
         arrowStates[key] := false
@@ -85,11 +138,54 @@ CapsLock Up:: {
     UnsetHotKeys()
 }
 
-;#HotIf capsLockHeld && A_TickCount - capsLockTimer >= longPressThreshold
+
+; INIBITE KEY TO DO OTHER
+#HotIf capsLockHeld && A_TickCount - capsLockTimer >= longPressThreshold
+    ;
+#HotIf
+
+#HotIf !capsLockHeld
+    ;
+#HotIf
+
+
+; ******************************************************************************
+; * HOME ROW
+; ******************************************************************************
+
+SetHomeRowHotKeys() {
+
+;    Hotkey(GroupHomeRow["_lwin"],            (*) => StartHomeRow(GroupHomeRow["_lwin"], "LWin"))
+;    Hotkey(GroupHomeRow["_lwin"] " UP",      (*) => StopHomeRow(GroupHomeRow["_lwin"], "LWin"))
+;    Hotkey(GroupHomeRow["_lalt"],            (*) => StartHomeRow(GroupHomeRow["_lalt"], "Alt"))
+;    Hotkey(GroupHomeRow["_lalt"] " UP",      (*) => StopHomeRow(GroupHomeRow["_lalt"], "Alt"))
+;    Hotkey(GroupHomeRow["_lctrl"],           (*) => StartHomeRow(GroupHomeRow["_lctrl"], "Ctrl"))
+;    Hotkey(GroupHomeRow["_lctrl"] " UP",     (*) => StopHomeRow(GroupHomeRow["_lctrl"], "Ctrl"))
+;    Hotkey(GroupHomeRow["_lshift"],          (*) => StartHomeRow(GroupHomeRow["_lshift"], "Shift"))
+;    Hotkey(GroupHomeRow["_lshift"] " UP",    (*) => StopHomeRow(GroupHomeRow["_lshift"], "Shift"))
+;    Hotkey(GroupHomeRow["_rwin"],            (*) => StartHomeRow(GroupHomeRow["_rwin"], "RWin"))
+;    Hotkey(GroupHomeRow["_rwin"] " UP",      (*) => StopHomeRow(GroupHomeRow["_rwin"], "RWin"))
+;    Hotkey(GroupHomeRow["_ralt"],            (*) => StartHomeRow(GroupHomeRow["_ralt"], "Alt"))
+;    Hotkey(GroupHomeRow["_ralt"] " UP",      (*) => StopHomeRow(GroupHomeRow["_ralt"], "Alt"))
+;    Hotkey(GroupHomeRow["_rctrl"],           (*) => StartHomeRow(GroupHomeRow["_rctrl"], "Ctrl"))
+;    Hotkey(GroupHomeRow["_rctrl"] " UP",     (*) => StopHomeRow(GroupHomeRow["_rctrl"], "Ctrl"))
+;    Hotkey(GroupHomeRow["_rshift"],          (*) => StartHomeRow(GroupHomeRow["_rshift"], "Shift"))
+;    Hotkey(GroupHomeRow["_rshift"] " UP",    (*) => StopHomeRow(GroupHomeRow["_rshift"], "Shift"))
 ;
-;#HotIf
+;    for k, v in GroupHomeRow {
+;        Hotkey(v,       "On")
+;        Hotkey(v " UP", "On")
+;    }
+
+}
+
+
+; ******************************************************************************
+; * SET HOT KEYS
+; ******************************************************************************
 
 SetHotKeys() {
+
     Hotkey(GroupMouseMove["_up"],            (*) => StartArrow("Up"))
     Hotkey(GroupMouseMove["_up"] " UP",      (*) => StopArrow("Up"))
     Hotkey(GroupMouseMove["_left"],          (*) => StartArrow("Left"))
@@ -126,44 +222,42 @@ SetHotKeys() {
     Hotkey(GroupKeyPad["_9"],                (*) => Send("9"))
     Hotkey(GroupKeyPad["_0"],                (*) => Send("0"))
 
-    try {
-        for k, v in GroupMouseMove {
-            Hotkey(v,       "On")
-            Hotkey(v " UP", "On")
-        }
-        for k, v in GroupMouseMove2 {
-            Hotkey(v,       "On")
-            Hotkey(v " UP", "On")
-        }
-        for k, v in GroupMouseClick {
-            Hotkey(v,       "On")
-            Hotkey(v " UP", "On")
-        }
-        for k, v in GroupKeyPad {
-            Hotkey(v,       "On")
-        }
+    for k, v in GroupMouseMove {
+        Hotkey(v,       "On")
+        Hotkey(v " UP", "On")
     }
+    for k, v in GroupMouseMove2 {
+        Hotkey(v,       "On")
+        Hotkey(v " UP", "On")
+    }
+    for k, v in GroupMouseClick {
+        Hotkey(v,       "On")
+        Hotkey(v " UP", "On")
+    }
+    for k, v in GroupKeyPad {
+        Hotkey(v,       "On")
+    }
+    for k, v in GroupMouseMultiplier {
+        Hotkey(v,       (*) => )
+    }
+
+    Hotkey(GroupMouseScroll["_activeScroll"], (*) =>)
+
 }
     
+
+; ******************************************************************************
+; * UNSET HOT KEYS
+; ******************************************************************************
+
 UnsetHotKeys() {
-    try {
-        for k, v in GroupMouseMove  {
-            Hotkey(v,       "Off")
-            Hotkey(v " UP", "Off")
-        }
-        for k, v in GroupMouseMove2 {
-            Hotkey(v,       "Off")
-            Hotkey(v " UP", "Off")
-        }
-        for k, v in GroupMouseClick {
-            Hotkey(v,       "Off")
-            Hotkey(v " UP", "Off")
-        }
-        for k, v in GroupKeyPad     {
-            Hotkey(v,       "Off")
-        }
-    }
+    reload()
 }
+
+
+; ******************************************************************************
+; * ARROWS
+; ******************************************************************************
 
 StartArrow(key) {
     global firstArrowPressTime
@@ -185,13 +279,46 @@ StopArrow(key) {
     }
 }
 
+
+; ******************************************************************************
+; * HOME ROW
+; ******************************************************************************
+
+StartHomeRow(key, value) {
+    global HomeRowTimer
+    if (HomeRowTimer = 0) {
+        HomeRowTimer := A_TickCount
+    }
+
+    if (A_PriorHotkey = key and A_TimeSincePriorHotkey > (longPressThreshold * 2)) {
+        Send "{" value " Down}"
+    }
+
+}
+
+StopHomeRow(key, value) {
+    global HomeRowTimer
+    Send "{" value " Up}"
+
+    if A_TickCount - HomeRowTimer < (longPressThreshold * 2) {
+        Send key
+    }
+    HomeRowTimer := 0
+}
+    
+
+; ******************************************************************************
 ; PRIMARY TIMER
+; ******************************************************************************
+
 SetTimer(MoveMouseContinuously, 10)
 
-MoveMouseContinuously(*) {
-    global reverseVScroll
-    global reverseHScroll
 
+; ******************************************************************************
+; * MOUSE MOVER
+; ******************************************************************************
+
+MoveMouseContinuously(*) {
     if !capsLockHeld
         return
 
@@ -200,26 +327,26 @@ MoveMouseContinuously(*) {
 
     elapsedMove := A_TickCount - firstArrowPressTime
     if arrowStates["Left"]
-        if(GetKeyState("Space", "P")) {
-            direction := reverseVScroll ? "{WheelLeft}" : "{WheelRight}"
+        if(GetKeyState(GroupMouseScroll["_activeScroll"], "P")) {
+            direction := GroupMouseScroll["_reverseVScroll"] ? "{WheelLeft}" : "{WheelRight}"
             SendEvent(direction)
         } else
             dx -= GetSpeed(elapsedMove)
     if arrowStates["Right"]
-        if(GetKeyState("Space", "P")) {
-            direction := reverseVScroll ? "{WheelRight}" : "{WheelLeft}"
+        if(GetKeyState(GroupMouseScroll["_activeScroll"], "P")) {
+            direction := GroupMouseScroll["_reverseVScroll"] ? "{WheelRight}" : "{WheelLeft}"
             SendEvent(direction)
         } else
             dx += GetSpeed(elapsedMove)
     if arrowStates["Up"]
-        if(GetKeyState("Space", "P")) {
-            direction := reverseVScroll ? "{WheelUp}" : "{WheelDown}"
+        if(GetKeyState(GroupMouseScroll["_activeScroll"], "P")) {
+            direction := GroupMouseScroll["_reverseVScroll"] ? "{WheelUp}" : "{WheelDown}"
             SendEvent(direction)
         } else
             dy -= GetSpeed(elapsedMove)
     if arrowStates["Down"]
-        if(GetKeyState("Space", "P")) {
-            direction := reverseVScroll ? "{WheelDown}" : "{WheelUp}"
+        if(GetKeyState(GroupMouseScroll["_activeScroll"], "P")) {
+            direction := GroupMouseScroll["_reverseVScroll"] ? "{WheelDown}" : "{WheelUp}"
             SendEvent(direction)
         } else
             dy += GetSpeed(elapsedMove)
@@ -227,15 +354,20 @@ MoveMouseContinuously(*) {
         MouseMove(dx, dy, 0, "R")
 }
 
+
+; ******************************************************************************
+; MOUSE SPEED
+; ******************************************************************************
+
 GetSpeed(elapsedMove, panning := false) {
     global mouseMoltiplier
 
     mouseMoltiplier := 1
-    if(GetKeyState("a", "P"))
+    if(GetKeyState(GroupMouseMultiplier["_multiplier1"], "P"))
         DoubleMouseMultiplier()
-    if(GetKeyState("s", "P"))
+    if(GetKeyState(GroupMouseMultiplier["_multiplier2"], "P"))
         DoubleMouseMultiplier()
-    if(GetKeyState("d", "P"))
+    if(GetKeyState(GroupMouseMultiplier["_multiplier3"], "P"))
         DoubleMouseMultiplier()
 
     timeMoltiplier := min(elapsedMove/100, 12)
@@ -250,6 +382,11 @@ GetSpeed(elapsedMove, panning := false) {
     return ret
 }
 
+
+; ******************************************************************************
+; MOUSE SPEED MOLTIPLIER
+; ******************************************************************************
+
 DoubleMouseMultiplier() {
     global mouseMoltiplier
     mouseMoltiplier := mouseMoltiplier * 2
@@ -257,16 +394,14 @@ DoubleMouseMultiplier() {
         mouseMoltiplier := 12
 }
 
-; NOT USED
-HalveMouseMultiplier() {
-    global mouseMoltiplier
-    mouseMoltiplier := mouseMoltiplier / 2
-    if mouseMoltiplier < 1
-        mouseMoltiplier := 1
-}
+
+; ******************************************************************************
+; SHOW TEXT
+; ******************************************************************************
 
 ShowText(txt, duration := 500) {
-    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x08000000")  ; NO BORDERS NO BAR: WS_EX_NOACTICE
+    ; SoundBeep(600, 200)
+    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow", "NoFocus GUI")
 
     ; GUI SPECS
     MyGui.BackColor := "Black"
@@ -287,5 +422,10 @@ ShowText(txt, duration := 500) {
     myGui.Show("AutoSize Center y" y)
 
     ; WAIT AND CLOSE GUI
-    SetTimer(() => MyGui.Destroy(), -duration)
+    ; SetTimer(() => MyGui.Destroy(), -duration)
+}
+
+HideText() {
+    global MyGui
+    MyGui.Destroy()
 }
