@@ -111,8 +111,6 @@ $CapsLock:: {
             SetHotKeys()
         }
     } else {
-        global capsLockHeld := false
-        global capsLockTimer := 0
         SetCapsLockState(!GetKeyState("CapsLock", "T"))
     }
 }
