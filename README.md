@@ -5,26 +5,25 @@ Somethinkg to know
 
 - KeyActivator: <b>CapsLock</b>
 
-To make the shortcuts work, the long press, after 200ms, of the CapsLock key is intercepted.
+To make the shortcuts work, double click CapsLock key is intercepted.
 
-Holding this down, the following keys are managed:
+After this, the following keys are managed:
 
 - Left Arrow: <b>mouse left</b>
 - Down Arrow: <b>mouse down</b>
 - Up arrow: <b>mouse up</b>
 - Right Arrow: <b>mouse right</b>
 
-like vim, if you don't have cursor arrows available:
-- h: <b>mouse left</b>
-- j: <b>mouse down</b>
-- k: <b>mouse up</b>
+- i: <b>mouse up</b>
+- j: <b>mouse left</b>
+- k: <b>mouse down</b>
 - l: <b>mouse right</b>
 
-- f: <b>Left Click</b>
-- RCtrl: <b>Right Click</b>
-- AppsKey: <b>Middle click</b>
+- c: <b>Left Click</b>
+- z: <b>Right Click</b>
+- x: <b>Middle click</b>
 
-- Space pressed: <b>Actove Scroll</b>
+- Space pressed: <b>Active Scroll</b>
 
 all clicks can be used in drag mode.
 
@@ -48,4 +47,6 @@ For TKL keyboards:
 - End: <b>2</b>
 - PgDn: <b>3</b>
 - \\: <b>0</b>
+
+All keys can be parametrized in ini file
 
