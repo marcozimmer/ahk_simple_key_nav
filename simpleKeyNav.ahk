@@ -26,6 +26,7 @@ global ShiftTimer := 0
 
 global HomeRowTimer := 0
 
+GroupSystem          := Map()
 GroupHomeRow         := Map()
 GroupMouseMove       := Map()
 GroupMouseMove2      := Map()
@@ -34,16 +35,18 @@ GroupMouseMultiplier := Map()
 GroupMouseScroll     := Map()
 GroupKeyPad          := Map()
 
+; SYSTEM
+GroupHomeRow["_sountFeedback"] := IniRead(config, "System", "sountFeedback", true)
 
 ; HOME ROW
-GroupHomeRow["_lwin"]    := IniRead(config, "HomeRow", "LWin", "a")
-GroupHomeRow["_lalt"]    := IniRead(config, "HomeRow", "LAlt", "s")
-GroupHomeRow["_lctrl"]   := IniRead(config, "HomeRow", "LCtrl", "d")
-GroupHomeRow["_lshift"]  := IniRead(config, "HomeRow", "LShift", "f")
-GroupHomeRow["_rwin"]    := IniRead(config, "HomeRow", "RWin", ";")
-GroupHomeRow["_ralt"]    := IniRead(config, "HomeRow", "RAlt", "l")
-GroupHomeRow["_rctrl"]   := IniRead(config, "HomeRow", "RCtrl", "k")
-GroupHomeRow["_rshift"]  := IniRead(config, "HomeRow", "RShift", "j")
+GroupHomeRow["_lwin"]    := IniRead(config, "HomeRow", "lwin", "a")
+GroupHomeRow["_lalt"]    := IniRead(config, "HomeRow", "lalt", "s")
+GroupHomeRow["_lctrl"]   := IniRead(config, "HomeRow", "lctrl", "d")
+GroupHomeRow["_lshift"]  := IniRead(config, "HomeRow", "lshift", "f")
+GroupHomeRow["_rwin"]    := IniRead(config, "HomeRow", "rwin", ";")
+GroupHomeRow["_ralt"]    := IniRead(config, "HomeRow", "ralt", "l")
+GroupHomeRow["_rctrl"]   := IniRead(config, "HomeRow", "rctrl", "k")
+GroupHomeRow["_rshift"]  := IniRead(config, "HomeRow", "rshift", "j")
 
 ; MOUSE MOVE
 GroupMouseMove["_up"]      := IniRead(config, "MouseMove", "up", "Up")
@@ -96,10 +99,13 @@ $CapsLock:: {
         if capsLockHeld {
             SendEscape()
         } else {
+            ShowText("LAYER ON")
             SetCapsLockState(false)
 
-            SoundBeep(200, 100)
-            SoundBeep(300, 100)
+            if (GroupHomeRow["_sountFeedback"]) {
+                SoundBeep(200, 100)
+                SoundBeep(300, 100)
+            }
 
             firstArrowPressTime := 0
 
@@ -124,10 +130,11 @@ $Esc:: {
 }
 
 SendEscape() {
-    ; HideText()
 
-    SoundBeep(300, 100)
-    SoundBeep(200, 100)
+    if (GroupHomeRow["_sountFeedback"]) {
+        SoundBeep(300, 100)
+        SoundBeep(200, 100)
+    }
 
     for key in arrowStates {
         arrowStates[key] := false
@@ -137,6 +144,9 @@ SendEscape() {
     global capsLockHeld := false
 
     UnsetHotKeys()
+    SetCapsLockState(false)
+
+    HideText()
 }
 
 
@@ -401,11 +411,10 @@ DoubleMouseMultiplier() {
 ; ******************************************************************************
 
 ShowText(txt, duration := 500) {
-    ; SoundBeep(600, 200)
-    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow", "NoFocus GUI")
+    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow", "NoFocus GUI NoActivate")
 
     ; GUI SPECS
-    MyGui.BackColor := "Black"
+    MyGui.BackColor := "Green"
     MyGui.SetFont("s10 cWhite", "Segoe UI")
     MyGui.Add("Text", "Center w200", txt)
 
