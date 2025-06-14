@@ -102,19 +102,19 @@ $CapsLock:: {
             ShowText("LAYER ON")
             SetCapsLockState(false)
 
-            if (GroupHomeRow["_sountFeedback"]) {
-                SoundBeep(200, 100)
-                SoundBeep(300, 100)
-            }
-
             firstArrowPressTime := 0
 
             global capsLockTimer := A_TickCount
             global capsLockHeld := true
             global mouseMoltiplier := 1
 
-
             SetHotKeys()
+
+            if (GroupHomeRow["_sountFeedback"]) {
+                SoundBeep(200, 100)
+                SoundBeep(300, 100)
+            }
+
         }
     } else {
         SetCapsLockState(!GetKeyState("CapsLock", "T"))
@@ -122,7 +122,7 @@ $CapsLock:: {
 }
 
 $Esc:: {
-    if(capsLockHeld) {
+    if (capsLockHeld and A_PriorHotkey = "$Esc" and A_TimeSincePriorHotkey < 300 and A_TimeSincePriorHotkey > 100) {
         SendEscape()
     } else {
         Send("{Esc}")
@@ -411,28 +411,33 @@ DoubleMouseMultiplier() {
 ; ******************************************************************************
 
 ShowText(txt, duration := 500) {
-    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow", "NoFocus GUI NoActivate")
+    prevWin := WinExist("A")
 
-    ; GUI SPECS
-    MyGui.BackColor := "Green"
-    MyGui.SetFont("s10 cWhite", "Segoe UI")
-    MyGui.Add("Text", "Center w200", txt)
+    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow", "NoFocus GUI NoActivate")
 
     ; SCREEN SIZE
     screenWidth := A_ScreenWidth
     screenHeight := A_ScreenHeight
 
+    ; GUI SPECS
+    MyGui.BackColor := "Green"
+    WinSetTransparent(140, myGui.Hwnd)
+    MyGui.SetFont("s11 cWhite", "Segoe UI")
+    MyGui.Add("Text", "Center w" screenWidth, txt)
+
     ; GUI SIZE
     WinGetPos(&xGui, &yGui, &wGui, &hGui, myGui.Hwnd)
+    WinSetExStyle("+0x80020", MyGui.Hwnd) ; WS_EX_LAYERED (0x80000) | WS_EX_TRANSPARENT (0x20)
 
     ; CENTER BOTTOM POSITION
     x := (screenWidth - wGui) // 2
-    y := screenHeight - hGui - 100
+;   y := screenHeight - hGui - 100
+    y := 0
 
     myGui.Show("AutoSize Center y" y)
 
-    ; WAIT AND CLOSE GUI
-    ; SetTimer(() => MyGui.Destroy(), -duration)
+    if WinExist("ahk_id " prevWin)
+        WinActivate("ahk_id " prevWin)
 }
 
 HideText() {
