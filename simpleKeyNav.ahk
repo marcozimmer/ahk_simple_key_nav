@@ -55,10 +55,10 @@ GroupMouseMove["_left"]    := IniRead(config, "MouseMove", "left", "Left")
 GroupMouseMove["_right"]   := IniRead(config, "MouseMove", "right", "Right")
 
 ; ALT MOUSE MOVE
-GroupMouseMove2["_up2"]    := IniRead(config, "MouseMove2", "up", "i")
-GroupMouseMove2["_down2"]  := IniRead(config, "MouseMove2", "down", "k")
-GroupMouseMove2["_left2"]  := IniRead(config, "MouseMove2", "left", "j")
-GroupMouseMove2["_right2"] := IniRead(config, "MouseMove2", "right", "l")
+GroupMouseMove2["_up"]    := IniRead(config, "MouseMove2", "up", "i")
+GroupMouseMove2["_down"]  := IniRead(config, "MouseMove2", "down", "k")
+GroupMouseMove2["_left"]  := IniRead(config, "MouseMove2", "left", "j")
+GroupMouseMove2["_right"] := IniRead(config, "MouseMove2", "right", "l")
 
 ; ALT MOUSE CLICK
 GroupMouseClick["_lclick"] := IniRead(config, "MouseClick", "lclick", "c")
@@ -99,7 +99,7 @@ $CapsLock:: {
         if capsLockHeld {
             SendEscape()
         } else {
-            ShowText("LAYER ON")
+            ShowLayer()
             SetCapsLockState(false)
 
             firstArrowPressTime := 0
@@ -206,14 +206,14 @@ SetHotKeys() {
     Hotkey(GroupMouseMove["_right"],         (*) => StartArrow("Right"))
     Hotkey(GroupMouseMove["_right"] " UP",   (*) => StopArrow("Right"))
 
-    Hotkey(GroupMouseMove2["_up2"],          (*) => StartArrow("Up"))
-    Hotkey(GroupMouseMove2["_up2"] " UP",    (*) => StopArrow("Up"))
-    Hotkey(GroupMouseMove2["_left2"],        (*) => StartArrow("Left"))
-    Hotkey(GroupMouseMove2["_left2"] " UP",  (*) => StopArrow("Left"))
-    Hotkey(GroupMouseMove2["_down2"],        (*) => StartArrow("Down"))
-    Hotkey(GroupMouseMove2["_down2"] " UP",  (*) => StopArrow("Down"))
-    Hotkey(GroupMouseMove2["_right2"],       (*) => StartArrow("Right"))
-    Hotkey(GroupMouseMove2["_right2"] " UP", (*) => StopArrow("Right"))
+    Hotkey(GroupMouseMove2["_up"],           (*) => StartArrow("Up"))
+    Hotkey(GroupMouseMove2["_up"] " UP",     (*) => StopArrow("Up"))
+    Hotkey(GroupMouseMove2["_left"],         (*) => StartArrow("Left"))
+    Hotkey(GroupMouseMove2["_left"] " UP",   (*) => StopArrow("Left"))
+    Hotkey(GroupMouseMove2["_down"],         (*) => StartArrow("Down"))
+    Hotkey(GroupMouseMove2["_down"] " UP",   (*) => StopArrow("Down"))
+    Hotkey(GroupMouseMove2["_right"],        (*) => StartArrow("Right"))
+    Hotkey(GroupMouseMove2["_right"] " UP",  (*) => StopArrow("Right"))
 
     Hotkey(GroupMouseClick["_lclick"],       (*) => Send("{LButton down}"))
     Hotkey(GroupMouseClick["_lclick"] " UP", (*) => Send("{LButton up}"))
@@ -277,7 +277,6 @@ StartArrow(key) {
     if (firstArrowPressTime = 0) {
         firstArrowPressTime := A_TickCount
     }
-    ; ShowText(key . " " . arrowStates["Left"] . " " . arrowStates["Right"] . " " . arrowStates["Up"] . " " . arrowStates["Down"])
 }
 
 StopArrow(key) {
@@ -388,8 +387,6 @@ GetSpeed(elapsedMove, panning := false) {
     else
         ret:= 2 * (timeMoltiplier * mouseMoltiplier)
 
-    ; ShowText(timeMoltiplier . " " . mouseMoltiplier . " " . (timeMoltiplier * mouseMoltiplier))
-
     return ret
 }
 
@@ -400,7 +397,7 @@ GetSpeed(elapsedMove, panning := false) {
 
 DoubleMouseMultiplier() {
     global mouseMoltiplier
-    mouseMoltiplier := mouseMoltiplier * 2
+    mouseMoltiplier := mouseMoltiplier * 1.6
     if mouseMoltiplier > 12
         mouseMoltiplier := 12
 }
@@ -410,20 +407,54 @@ DoubleMouseMultiplier() {
 ; SHOW TEXT
 ; ******************************************************************************
 
-ShowText(txt, duration := 500) {
-    prevWin := WinExist("A")
-
-    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow", "NoFocus GUI NoActivate")
-
+ShowLayer() {
     ; SCREEN SIZE
     screenWidth := A_ScreenWidth
     screenHeight := A_ScreenHeight
 
+    ; LAST WINDOW FOCUS
+    prevWin := WinExist("A")
+
+    ; TEXT OFFSET
+    offset   := 0
+    fontSize := 12
+    fontSpace := fontSize / 125 * A_ScreenDPI
+    icoWidth := 40
+    textSpace := 50
+
+    MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow", "NoFocus GUI NoActivate")
+
     ; GUI SPECS
     MyGui.BackColor := "Green"
     WinSetTransparent(140, myGui.Hwnd)
-    MyGui.SetFont("s11 cWhite", "Segoe UI")
-    MyGui.Add("Text", "Center w" screenWidth, txt)
+
+    ; FONT SIZE
+    MyGui.SetFont("s" fontSize " cBlack", "Cascadia Mono")
+
+    txt1 := "UP: " GroupMouseMove["_up"] "/" GroupMouseMove2["_up"] " - DOWN: " GroupMouseMove["_down"] "/" GroupMouseMove2["_down"] " - LEFT: " GroupMouseMove["_left"] "/" GroupMouseMove2["_left"] " - RIGHT: " GroupMouseMove["_right"] "/" GroupMouseMove2["_right"]
+    txt2 := "Left: " GroupMouseClick["_lclick"] " - Center: " GroupMouseClick["_mclick"] " - Right: " GroupMouseClick["_rclick"]
+    txt3 := "Scroll: " GroupMouseScroll["_activeScroll"]
+    txt4 := "Multiplier: " GroupMouseMultiplier["_multiplier1"] "/" GroupMouseMultiplier["_multiplier2"] "/" GroupMouseMultiplier["_multiplier3"]
+
+    offset1 := 0
+    offset2 := textSpace + offset1 + icoWidth + (fontSpace * StrLen(txt1))
+    offset3 := textSpace + offset2 + icoWidth + (fontSpace * StrLen(txt2))
+    offset4 := textSpace + offset3 + icoWidth + (fontSpace * StrLen(txt3))
+    offset5 := textSpace + offset4 + icoWidth + (fontSpace * StrLen(txt4))
+
+    offset := (screenWidth - offset5 ) / 2
+
+    MyGui.AddPicture( "x" offset + offset1 - icoWidth " y10 w24 h24", "icons/mouse.ico" )
+    MyGui.AddText( "x" offset + offset1 " yp", txt1 )
+
+    MyGui.AddPicture( "x" offset + offset2 - icoWidth " y10 w24 h24", "icons/click.ico" )
+    MyGui.AddText( "x" offset + offset2 " yp", txt2 )
+
+    MyGui.AddPicture( "x" offset + offset3 - icoWidth " y10 w24 h24", "icons/scroll.ico" )
+    MyGui.AddText( "x" offset + offset3 " yp", txt3 )
+
+    MyGui.AddPicture( "x" offset + offset4 - icoWidth " y10 w24 h24", "icons/speed.ico" )
+    MyGui.AddText( "x" offset + offset4 " yp", txt4 )
 
     ; GUI SIZE
     WinGetPos(&xGui, &yGui, &wGui, &hGui, myGui.Hwnd)
@@ -431,10 +462,9 @@ ShowText(txt, duration := 500) {
 
     ; CENTER BOTTOM POSITION
     x := (screenWidth - wGui) // 2
-;   y := screenHeight - hGui - 100
-    y := 0
+    y := 0 ; screenHeight - hGui - 100
 
-    myGui.Show("AutoSize Center y" y)
+    myGui.Show("Center y" y " w" screenWidth)
 
     if WinExist("ahk_id " prevWin)
         WinActivate("ahk_id " prevWin)
