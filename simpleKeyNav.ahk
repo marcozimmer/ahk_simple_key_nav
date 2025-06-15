@@ -99,7 +99,6 @@ $CapsLock:: {
         if capsLockHeld {
             SendEscape()
         } else {
-            ShowLayer()
             SetCapsLockState(false)
 
             firstArrowPressTime := 0
@@ -109,6 +108,8 @@ $CapsLock:: {
             global mouseMoltiplier := 1
 
             SetHotKeys()
+
+            ShowLayer()
 
             if (GroupHomeRow["_sountFeedback"]) {
                 SoundBeep(200, 100)
