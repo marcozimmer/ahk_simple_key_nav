@@ -7,6 +7,8 @@ Somethinkg to know
 
 To make the shortcuts work, double click CapsLock key is intercepted.
 
+To release the shortcuts work, double click CapsLock or doucle click Esc key is intercepted.
+
 After this, the following keys are managed:
 
 - Left Arrow: <b>mouse left</b>
