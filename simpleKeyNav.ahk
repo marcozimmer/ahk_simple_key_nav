@@ -36,34 +36,48 @@ GroupMouseScroll     := Map()
 GroupKeyPad          := Map()
 
 ; SYSTEM
-GroupHomeRow["_sountFeedback"] := IniRead(config, "System", "sountFeedback", true)
+GroupSystem["_sountFeedback"]        := IniRead(config, "System", "sountFeedback", true)
+GroupSystem["_barTransparence"]      := IniRead(config, "System", "barTransparence", 160)
+GroupSystem["_barColor"]             := IniRead(config, "System", "barColor", "Green")
+GroupSystem["_barPadding"]           := IniRead(config, "System", "barPadding", 100)
+GroupSystem["_barFontSize"]          := IniRead(config, "System", "barFontSize", 12)
+GroupSystem["_barFontSpace"]         := IniRead(config, "System", "barFontSpace", 125)
+GroupSystem["_barFontColor"]         := IniRead(config, "System", "barFontColor", "White")
+GroupSystem["_barFontFamily"]        := IniRead(config, "System", "barFontFamily", "Cascadia Mono")
+GroupSystem["_barIcoWidth"]          := IniRead(config, "System", "barIcoWidth", 40)
+GroupSystem["_barTextSpace"]         := IniRead(config, "System", "barTextSpace", 50)
+GroupSystem["_clickIcon"]            := IniRead(config, "System", "clickIcon", "click_w.ico")
+GroupSystem["_mouseIcon"]            := IniRead(config, "System", "mouseIcon", "mouse_w.ico")
+GroupSystem["_scrollIcon"]           := IniRead(config, "System", "scrollIcon", "scroll_w.ico")
+GroupSystem["_speedIcon"]            := IniRead(config, "System", "speedIcon", "speed_w.ico")
+
 
 ; HOME ROW
-GroupHomeRow["_lwin"]    := IniRead(config, "HomeRow", "lwin", "a")
-GroupHomeRow["_lalt"]    := IniRead(config, "HomeRow", "lalt", "s")
-GroupHomeRow["_lctrl"]   := IniRead(config, "HomeRow", "lctrl", "d")
-GroupHomeRow["_lshift"]  := IniRead(config, "HomeRow", "lshift", "f")
-GroupHomeRow["_rwin"]    := IniRead(config, "HomeRow", "rwin", ";")
-GroupHomeRow["_ralt"]    := IniRead(config, "HomeRow", "ralt", "l")
-GroupHomeRow["_rctrl"]   := IniRead(config, "HomeRow", "rctrl", "k")
-GroupHomeRow["_rshift"]  := IniRead(config, "HomeRow", "rshift", "j")
+GroupHomeRow["_lwin"]                := IniRead(config, "HomeRow", "lwin", "a")
+GroupHomeRow["_lalt"]                := IniRead(config, "HomeRow", "lalt", "s")
+GroupHomeRow["_lctrl"]               := IniRead(config, "HomeRow", "lctrl", "d")
+GroupHomeRow["_lshift"]              := IniRead(config, "HomeRow", "lshift", "f")
+GroupHomeRow["_rwin"]                := IniRead(config, "HomeRow", "rwin", ";")
+GroupHomeRow["_ralt"]                := IniRead(config, "HomeRow", "ralt", "l")
+GroupHomeRow["_rctrl"]               := IniRead(config, "HomeRow", "rctrl", "k")
+GroupHomeRow["_rshift"]              := IniRead(config, "HomeRow", "rshift", "j")
 
 ; MOUSE MOVE
-GroupMouseMove["_up"]      := IniRead(config, "MouseMove", "up", "Up")
-GroupMouseMove["_down"]    := IniRead(config, "MouseMove", "down", "Down")
-GroupMouseMove["_left"]    := IniRead(config, "MouseMove", "left", "Left")
-GroupMouseMove["_right"]   := IniRead(config, "MouseMove", "right", "Right")
+GroupMouseMove["_up"]                := IniRead(config, "MouseMove", "up", "Up")
+GroupMouseMove["_down"]              := IniRead(config, "MouseMove", "down", "Down")
+GroupMouseMove["_left"]              := IniRead(config, "MouseMove", "left", "Left")
+GroupMouseMove["_right"]             := IniRead(config, "MouseMove", "right", "Right")
 
 ; ALT MOUSE MOVE
-GroupMouseMove2["_up"]    := IniRead(config, "MouseMove2", "up", "i")
-GroupMouseMove2["_down"]  := IniRead(config, "MouseMove2", "down", "k")
-GroupMouseMove2["_left"]  := IniRead(config, "MouseMove2", "left", "j")
-GroupMouseMove2["_right"] := IniRead(config, "MouseMove2", "right", "l")
+GroupMouseMove2["_up"]               := IniRead(config, "MouseMove2", "up", "i")
+GroupMouseMove2["_down"]             := IniRead(config, "MouseMove2", "down", "k")
+GroupMouseMove2["_left"]             := IniRead(config, "MouseMove2", "left", "j")
+GroupMouseMove2["_right"]            := IniRead(config, "MouseMove2", "right", "l")
 
 ; ALT MOUSE CLICK
-GroupMouseClick["_lclick"] := IniRead(config, "MouseClick", "lclick", "c")
-GroupMouseClick["_mclick"] := IniRead(config, "MouseClick", "mclick", "x")
-GroupMouseClick["_rclick"] := IniRead(config, "MouseClick", "rclick", "z")
+GroupMouseClick["_lclick"]           := IniRead(config, "MouseClick", "lclick", "c")
+GroupMouseClick["_mclick"]           := IniRead(config, "MouseClick", "mclick", "x")
+GroupMouseClick["_rclick"]           := IniRead(config, "MouseClick", "rclick", "z")
 
 ; ALT MOUSE MULTIPLIER
 GroupMouseMultiplier["_multiplier1"] := IniRead(config, "MouseMultiplier", "multiplier1", "a")
@@ -72,21 +86,21 @@ GroupMouseMultiplier["_multiplier3"] := IniRead(config, "MouseMultiplier", "mult
 
 
 ; ALT MOUSE SCROLL
-GroupMouseScroll["_reverseVScroll"] := IniRead(config, "MouseScroll", "reverseVScroll", "false")
-GroupMouseScroll["_reverseHScroll"] := IniRead(config, "MouseScroll", "reverseHScroll", "false")
-GroupMouseScroll["_activeScroll"]   := IniRead(config, "MouseScroll", "activeScroll", "Space")
+GroupMouseScroll["_reverseVScroll"]  := IniRead(config, "MouseScroll", "reverseVScroll", "false")
+GroupMouseScroll["_reverseHScroll"]  := IniRead(config, "MouseScroll", "reverseHScroll", "false")
+GroupMouseScroll["_activeScroll"]    := IniRead(config, "MouseScroll", "activeScroll", "Space")
 
 ; KEYPAD
-GroupKeyPad["_1"]          := IniRead(config, "KeyPad", "1", "PrintScreen")
-GroupKeyPad["_2"]          := IniRead(config, "KeyPad", "2", "ScrollLock")
-GroupKeyPad["_3"]          := IniRead(config, "KeyPad", "3", "Pause")
-GroupKeyPad["_4"]          := IniRead(config, "KeyPad", "4", "Insert")
-GroupKeyPad["_5"]          := IniRead(config, "KeyPad", "5", "Home")
-GroupKeyPad["_6"]          := IniRead(config, "KeyPad", "6", "PgUp")
-GroupKeyPad["_7"]          := IniRead(config, "KeyPad", "7", "Delete")
-GroupKeyPad["_8"]          := IniRead(config, "KeyPad", "8", "End")
-GroupKeyPad["_9"]          := IniRead(config, "KeyPad", "9", "PgDn")
-GroupKeyPad["_0"]          := IniRead(config, "KeyPad", "0", "\")
+GroupKeyPad["_1"]                    := IniRead(config, "KeyPad", "1", "PrintScreen")
+GroupKeyPad["_2"]                    := IniRead(config, "KeyPad", "2", "ScrollLock")
+GroupKeyPad["_3"]                    := IniRead(config, "KeyPad", "3", "Pause")
+GroupKeyPad["_4"]                    := IniRead(config, "KeyPad", "4", "Insert")
+GroupKeyPad["_5"]                    := IniRead(config, "KeyPad", "5", "Home")
+GroupKeyPad["_6"]                    := IniRead(config, "KeyPad", "6", "PgUp")
+GroupKeyPad["_7"]                    := IniRead(config, "KeyPad", "7", "Delete")
+GroupKeyPad["_8"]                    := IniRead(config, "KeyPad", "8", "End")
+GroupKeyPad["_9"]                    := IniRead(config, "KeyPad", "9", "PgDn")
+GroupKeyPad["_0"]                    := IniRead(config, "KeyPad", "0", "\")
 
 ; SetHomeRowHotKeys()
 
@@ -111,7 +125,7 @@ $CapsLock:: {
 
             ShowLayer()
 
-            if (GroupHomeRow["_sountFeedback"]) {
+            if (GroupSystem["_sountFeedback"]) {
                 SoundBeep(200, 100)
                 SoundBeep(300, 100)
             }
@@ -132,7 +146,7 @@ $Esc:: {
 
 SendEscape() {
 
-    if (GroupHomeRow["_sountFeedback"]) {
+    if (GroupSystem["_sountFeedback"]) {
         SoundBeep(300, 100)
         SoundBeep(200, 100)
     }
@@ -418,19 +432,19 @@ ShowLayer() {
 
     ; TEXT OFFSET
     offset   := 0
-    fontSize := 12
-    fontSpace := fontSize / 125 * A_ScreenDPI
-    icoWidth := 40
-    textSpace := 50
+    fontSize := GroupSystem["_barFontSize"]
+    fontSpace := fontSize / GroupSystem["_barFontSpace"] * A_ScreenDPI
+    icoWidth := GroupSystem["_barIcoWidth"]
+    textSpace := GroupSystem["_barTextSpace"]
 
     MyGui := Gui("+AlwaysOnTop -Caption +ToolWindow", "NoFocus GUI NoActivate")
 
     ; GUI SPECS
-    MyGui.BackColor := "Green"
-    WinSetTransparent(140, myGui.Hwnd)
+    MyGui.BackColor := GroupSystem["_barColor"]
+    WinSetTransparent(GroupSystem["_barTransparence"], myGui.Hwnd)
 
     ; FONT SIZE
-    MyGui.SetFont("s" fontSize " cBlack", "Cascadia Mono")
+    MyGui.SetFont("s" fontSize " c" GroupSystem["_barFontColor"], GroupSystem["_barFontFamily"] "")
 
     txt1 := "UP: " GroupMouseMove["_up"] "/" GroupMouseMove2["_up"] " - DOWN: " GroupMouseMove["_down"] "/" GroupMouseMove2["_down"] " - LEFT: " GroupMouseMove["_left"] "/" GroupMouseMove2["_left"] " - RIGHT: " GroupMouseMove["_right"] "/" GroupMouseMove2["_right"]
     txt2 := "Left: " GroupMouseClick["_lclick"] " - Center: " GroupMouseClick["_mclick"] " - Right: " GroupMouseClick["_rclick"]
@@ -445,16 +459,16 @@ ShowLayer() {
 
     offset := (screenWidth - offset5 ) / 2
 
-    MyGui.AddPicture( "x" offset + offset1 - icoWidth " y10 w24 h24", "icons/mouse.ico" )
+    MyGui.AddPicture( "x" offset + offset1 - icoWidth " y10 w24 h24", "icons/" GroupSystem["_mouseIcon"] )
     MyGui.AddText( "x" offset + offset1 " yp", txt1 )
 
-    MyGui.AddPicture( "x" offset + offset2 - icoWidth " y10 w24 h24", "icons/click.ico" )
+    MyGui.AddPicture( "x" offset + offset2 - icoWidth " y10 w24 h24", "icons/" GroupSystem["_clickIcon"] )
     MyGui.AddText( "x" offset + offset2 " yp", txt2 )
 
-    MyGui.AddPicture( "x" offset + offset3 - icoWidth " y10 w24 h24", "icons/scroll.ico" )
+    MyGui.AddPicture( "x" offset + offset3 - icoWidth " y10 w24 h24", "icons/" GroupSystem["_scrollIcon"] )
     MyGui.AddText( "x" offset + offset3 " yp", txt3 )
 
-    MyGui.AddPicture( "x" offset + offset4 - icoWidth " y10 w24 h24", "icons/speed.ico" )
+    MyGui.AddPicture( "x" offset + offset4 - icoWidth " y10 w24 h24", "icons/" GroupSystem["_speedIcon"] )
     MyGui.AddText( "x" offset + offset4 " yp", txt4 )
 
     ; GUI SIZE
@@ -463,7 +477,7 @@ ShowLayer() {
 
     ; CENTER BOTTOM POSITION
     x := (screenWidth - wGui) // 2
-    y := 0 ; screenHeight - hGui - 100
+    y := 0 ; screenHeight - hGui - GroupSystem["_barPadding"]
 
     myGui.Show("Center y" y " w" screenWidth)
 
