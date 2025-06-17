@@ -80,6 +80,7 @@ GroupMouseClick["_mclick"]           := IniRead(config, "MouseClick", "mclick", 
 GroupMouseClick["_rclick"]           := IniRead(config, "MouseClick", "rclick", "z")
 
 ; ALT MOUSE MULTIPLIER
+GroupMouseMultiplier["_multiplier"]  := IniRead(config, "MouseMultiplier", "multiplier", 1.6)
 GroupMouseMultiplier["_multiplier1"] := IniRead(config, "MouseMultiplier", "multiplier1", "a")
 GroupMouseMultiplier["_multiplier2"] := IniRead(config, "MouseMultiplier", "multiplier2", "s")
 GroupMouseMultiplier["_multiplier3"] := IniRead(config, "MouseMultiplier", "multiplier3", "d")
@@ -108,45 +109,82 @@ GroupKeyPad["_0"]                    := IniRead(config, "KeyPad", "0", "\")
 ; CAPSLOCK
 ; ******************************************************************************
 
-$CapsLock:: {
-    if (A_PriorHotkey = "$CapsLock" and A_TimeSincePriorHotkey < 300 and A_TimeSincePriorHotkey > 100) {
-        if capsLockHeld {
-            SendEscape()
-        } else {
-            SetCapsLockState(false)
 
-            firstArrowPressTime := 0
+; HOLD
 
-            global capsLockTimer := A_TickCount
-            global capsLockHeld := true
-            global mouseMoltiplier := 1
+CapsLock:: {
+    if(!capsLockHeld) {
+        global capsLockTimer := A_TickCount
 
-            SetHotKeys()
+        firstArrowPressTime := 0
 
-            ShowLayer()
+        global capsLockTimer := A_TickCount
+        global capsLockHeld := true
+        global mouseMoltiplier := 1
 
-            if (GroupSystem["_sountFeedback"]) {
-                SoundBeep(200, 100)
-                SoundBeep(300, 100)
-            }
+        SetHotKeys()
+        ShowLayer()
 
+        if (GroupSystem["_sountFeedback"] == "true") {
+            SoundBeep(200, 100)
+            SoundBeep(300, 100)
         }
-    } else {
+    }
+}
+
+CapsLock Up:: {
+    elapsed := A_TickCount - capsLockTimer
+
+    if (elapsed < longPressThreshold) {
         SetCapsLockState(!GetKeyState("CapsLock", "T"))
     }
+
+    SendEscape()
 }
 
-$Esc:: {
-    if (capsLockHeld and A_PriorHotkey = "$Esc" and A_TimeSincePriorHotkey < 300 and A_TimeSincePriorHotkey > 100) {
-        SendEscape()
-    } else {
-        Send("{Esc}")
-    }
-}
+
+; DOUBLE TAP
+
+; $CapsLock:: {
+;     if (A_PriorHotkey = "$CapsLock" and A_TimeSincePriorHotkey < 300 and A_TimeSincePriorHotkey > 100) {
+;         if capsLockHeld {
+;             SendEscape()
+;         } else {
+;             SetCapsLockState(false)
+; 
+;             firstArrowPressTime := 0
+; 
+;             global capsLockTimer := A_TickCount
+;             global capsLockHeld := true
+;             global mouseMoltiplier := 1
+; 
+;             SetHotKeys()
+; 
+;             ShowLayer()
+; 
+;             if (GroupSystem["_sountFeedback"]) {
+;                 SoundBeep(200, 100)
+;                 SoundBeep(300, 100)
+;             }
+; 
+;         }
+;     } else {
+;         SetCapsLockState(!GetKeyState("CapsLock", "T"))
+;     }
+; }
+; 
+; $Esc:: {
+;     if (capsLockHeld and A_PriorHotkey = "$Esc" and A_TimeSincePriorHotkey < 300 and A_TimeSincePriorHotkey > 100) {
+;         SendEscape()
+;     } else {
+;         Send("{Esc}")
+;     }
+; }
+
 
 SendEscape() {
 
-    if (GroupSystem["_sountFeedback"]) {
+    if (GroupSystem["_sountFeedback"] == "true") {
         SoundBeep(300, 100)
         SoundBeep(200, 100)
     }
@@ -158,10 +196,10 @@ SendEscape() {
     firstArrowPressTime := 0
     global capsLockHeld := false
 
-    UnsetHotKeys()
-    SetCapsLockState(false)
-
     HideText()
+
+    UnsetHotKeys()
+
 }
 
 
@@ -212,62 +250,64 @@ SetHomeRowHotKeys() {
 
 SetHotKeys() {
 
-    Hotkey(GroupMouseMove["_up"],            (*) => StartArrow("Up"))
-    Hotkey(GroupMouseMove["_up"] " UP",      (*) => StopArrow("Up"))
-    Hotkey(GroupMouseMove["_left"],          (*) => StartArrow("Left"))
-    Hotkey(GroupMouseMove["_left"] " UP",    (*) => StopArrow("Left"))
-    Hotkey(GroupMouseMove["_down"],          (*) => StartArrow("Down"))
-    Hotkey(GroupMouseMove["_down"] " UP",    (*) => StopArrow("Down"))
-    Hotkey(GroupMouseMove["_right"],         (*) => StartArrow("Right"))
-    Hotkey(GroupMouseMove["_right"] " UP",   (*) => StopArrow("Right"))
+    try {
+        Hotkey(GroupMouseMove["_up"],            (*) => StartArrow("Up"))
+        Hotkey(GroupMouseMove["_up"] " UP",      (*) => StopArrow("Up"))
+        Hotkey(GroupMouseMove["_left"],          (*) => StartArrow("Left"))
+        Hotkey(GroupMouseMove["_left"] " UP",    (*) => StopArrow("Left"))
+        Hotkey(GroupMouseMove["_down"],          (*) => StartArrow("Down"))
+        Hotkey(GroupMouseMove["_down"] " UP",    (*) => StopArrow("Down"))
+        Hotkey(GroupMouseMove["_right"],         (*) => StartArrow("Right"))
+        Hotkey(GroupMouseMove["_right"] " UP",   (*) => StopArrow("Right"))
 
-    Hotkey(GroupMouseMove2["_up"],           (*) => StartArrow("Up"))
-    Hotkey(GroupMouseMove2["_up"] " UP",     (*) => StopArrow("Up"))
-    Hotkey(GroupMouseMove2["_left"],         (*) => StartArrow("Left"))
-    Hotkey(GroupMouseMove2["_left"] " UP",   (*) => StopArrow("Left"))
-    Hotkey(GroupMouseMove2["_down"],         (*) => StartArrow("Down"))
-    Hotkey(GroupMouseMove2["_down"] " UP",   (*) => StopArrow("Down"))
-    Hotkey(GroupMouseMove2["_right"],        (*) => StartArrow("Right"))
-    Hotkey(GroupMouseMove2["_right"] " UP",  (*) => StopArrow("Right"))
+        Hotkey(GroupMouseMove2["_up"],           (*) => StartArrow("Up"))
+        Hotkey(GroupMouseMove2["_up"] " UP",     (*) => StopArrow("Up"))
+        Hotkey(GroupMouseMove2["_left"],         (*) => StartArrow("Left"))
+        Hotkey(GroupMouseMove2["_left"] " UP",   (*) => StopArrow("Left"))
+        Hotkey(GroupMouseMove2["_down"],         (*) => StartArrow("Down"))
+        Hotkey(GroupMouseMove2["_down"] " UP",   (*) => StopArrow("Down"))
+        Hotkey(GroupMouseMove2["_right"],        (*) => StartArrow("Right"))
+        Hotkey(GroupMouseMove2["_right"] " UP",  (*) => StopArrow("Right"))
 
-    Hotkey(GroupMouseClick["_lclick"],       (*) => Send("{LButton down}"))
-    Hotkey(GroupMouseClick["_lclick"] " UP", (*) => Send("{LButton up}"))
-    Hotkey(GroupMouseClick["_mclick"],       (*) => Send("{MButton down}"))
-    Hotkey(GroupMouseClick["_mclick"] " UP", (*) => Send("{MButton up}"))
-    Hotkey(GroupMouseClick["_rclick"],       (*) => Send("{RButton down}"))
-    Hotkey(GroupMouseClick["_rclick"] " UP", (*) => Send("{RButton up}"))
+        Hotkey(GroupMouseClick["_lclick"],       (*) => Send("{LButton down}"))
+        Hotkey(GroupMouseClick["_lclick"] " UP", (*) => Send("{LButton up}"))
+        Hotkey(GroupMouseClick["_mclick"],       (*) => Send("{MButton down}"))
+        Hotkey(GroupMouseClick["_mclick"] " UP", (*) => Send("{MButton up}"))
+        Hotkey(GroupMouseClick["_rclick"],       (*) => Send("{RButton down}"))
+        Hotkey(GroupMouseClick["_rclick"] " UP", (*) => Send("{RButton up}"))
 
-    Hotkey(GroupKeyPad["_1"],                (*) => Send("1"))
-    Hotkey(GroupKeyPad["_2"],                (*) => Send("2"))
-    Hotkey(GroupKeyPad["_3"],                (*) => Send("3"))
-    Hotkey(GroupKeyPad["_4"],                (*) => Send("4"))
-    Hotkey(GroupKeyPad["_5"],                (*) => Send("5"))
-    Hotkey(GroupKeyPad["_6"],                (*) => Send("6"))
-    Hotkey(GroupKeyPad["_7"],                (*) => Send("7"))
-    Hotkey(GroupKeyPad["_8"],                (*) => Send("8"))
-    Hotkey(GroupKeyPad["_9"],                (*) => Send("9"))
-    Hotkey(GroupKeyPad["_0"],                (*) => Send("0"))
+        Hotkey(GroupKeyPad["_1"],                (*) => Send("1"))
+        Hotkey(GroupKeyPad["_2"],                (*) => Send("2"))
+        Hotkey(GroupKeyPad["_3"],                (*) => Send("3"))
+        Hotkey(GroupKeyPad["_4"],                (*) => Send("4"))
+        Hotkey(GroupKeyPad["_5"],                (*) => Send("5"))
+        Hotkey(GroupKeyPad["_6"],                (*) => Send("6"))
+        Hotkey(GroupKeyPad["_7"],                (*) => Send("7"))
+        Hotkey(GroupKeyPad["_8"],                (*) => Send("8"))
+        Hotkey(GroupKeyPad["_9"],                (*) => Send("9"))
+        Hotkey(GroupKeyPad["_0"],                (*) => Send("0"))
 
-    for k, v in GroupMouseMove {
-        Hotkey(v,       "On")
-        Hotkey(v " UP", "On")
-    }
-    for k, v in GroupMouseMove2 {
-        Hotkey(v,       "On")
-        Hotkey(v " UP", "On")
-    }
-    for k, v in GroupMouseClick {
-        Hotkey(v,       "On")
-        Hotkey(v " UP", "On")
-    }
-    for k, v in GroupKeyPad {
-        Hotkey(v,       "On")
-    }
-    for k, v in GroupMouseMultiplier {
-        Hotkey(v,       (*) => )
-    }
+        for k, v in GroupMouseMove {
+            Hotkey(v,       "On")
+            Hotkey(v " UP", "On")
+        }
+        for k, v in GroupMouseMove2 {
+            Hotkey(v,       "On")
+            Hotkey(v " UP", "On")
+        }
+        for k, v in GroupMouseClick {
+            Hotkey(v,       "On")
+            Hotkey(v " UP", "On")
+        }
+        for k, v in GroupKeyPad {
+            Hotkey(v,       "On")
+        }
+        for k, v in GroupMouseMultiplier {
+            Hotkey(v,       (*) => )
+        }
 
-    Hotkey(GroupMouseScroll["_activeScroll"], (*) =>)
+        Hotkey(GroupMouseScroll["_activeScroll"], (*) =>)
+    }
 
 }
     
@@ -412,7 +452,7 @@ GetSpeed(elapsedMove, panning := false) {
 
 DoubleMouseMultiplier() {
     global mouseMoltiplier
-    mouseMoltiplier := mouseMoltiplier * 1.6
+    mouseMoltiplier := mouseMoltiplier * (GroupMouseMultiplier["_multiplier"] + 0)
     if mouseMoltiplier > 12
         mouseMoltiplier := 12
 }
